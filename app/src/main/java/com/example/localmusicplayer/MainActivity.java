@@ -6,9 +6,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,7 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MediaPlayer.OnCompletionListener {
+
+    private static final String TAG = "MainActivity";
 
     private TextView mNameTV;
     private TextView mSingerTV;
@@ -33,7 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MusicRVAdapter mMusicRVAdapter;
     private List<SongBean> mMusicRVAdapterData;
 
-    private int currentPosition = -1;
+    private int mCurrentPosition = -1;
+    private int mProgress = 0;
 
     private MediaPlayer mMediaPlayer;
 
@@ -63,52 +68,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMusicRVAdapter.setOnItemClickListener(new MusicRVAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                currentPosition = position;
+                mCurrentPosition = position;
 
-                SongBean songBean = mMusicRVAdapterData.get(position);
-                mNameTV.setText(songBean.getName());
-                mSingerTV.setText(songBean.getSinger());
-
-                stopPlayer();
-
-                startPlayer(songBean);
+                changeMusic(position);
             }
         });
+    }
+
+    private void changeMusic(int position) {
+        SongBean songBean = mMusicRVAdapterData.get(position);
+
+        mNameTV.setText(songBean.getName());
+        mSingerTV.setText(songBean.getSinger());
+
+        stopPlayer();
+
+        startPlayer(songBean);
     }
 
     private void startPlayer(SongBean songBean) {
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setOnCompletionListener(this);
         }
 
         mMediaPlayer.reset();
 
         try {
             mMediaPlayer.setDataSource(songBean.getPath());
+            mMediaPlayer.prepare();
             play();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void stopPlayer() {
+        mProgress = 0;
+        if (mMediaPlayer != null) {
+            mMediaPlayer.pause();
+            mMediaPlayer.seekTo(mProgress);
+            mMediaPlayer.stop();
+        }
+        mPlayIV.setImageResource(R.mipmap.icon_play);
+    }
+
     private void play() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            try {
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mMediaPlayer.seekTo(mProgress);
+            mMediaPlayer.start();
         }
 
         mPlayIV.setImageResource(R.mipmap.icon_pause);
     }
 
-    private void stopPlayer() {
-        if (mMediaPlayer != null) {
+    private void pause() {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            mProgress = mMediaPlayer.getCurrentPosition();
             mMediaPlayer.pause();
-            mMediaPlayer.seekTo(0);
-            mMediaPlayer.stop();
         }
         mPlayIV.setImageResource(R.mipmap.icon_play);
     }
@@ -157,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMusicListRV = findViewById(R.id.main_music_list_rv);
 
         mPrevIV.setOnClickListener(this);
-        mNextIV.setOnClickListener(this);
+        mPlayIV.setOnClickListener(this);
         mNextIV.setOnClickListener(this);
     }
 
@@ -165,11 +182,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.main_music_controller_prev_iv:
+                if (mCurrentPosition == 0) {
+                    Toast.makeText(this, "duang!duang!duang!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mCurrentPosition -= 1;
+                changeMusic(mCurrentPosition);
                 break;
             case R.id.main_music_controller_play_iv:
+                Log.i(TAG, "onClick: ");
+                if (mCurrentPosition == -1) {
+                    Toast.makeText(this, "请选择要播放的音乐", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (mMediaPlayer.isPlaying()) {
+                    Log.i(TAG, "onClick: 1");
+                    pause();
+                } else {
+                    Log.i(TAG, "onClick: 2");
+                    play();
+                }
                 break;
             case R.id.main_music_controller_next_iv:
+                if (mCurrentPosition == mMusicRVAdapterData.size() - 1) {
+                    Toast.makeText(this, "duang!duang!duang!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mCurrentPosition += 1;
+                changeMusic(mCurrentPosition);
                 break;
         }
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        mProgress = 0;
+        mPlayIV.setImageResource(R.mipmap.icon_play);
     }
 }
