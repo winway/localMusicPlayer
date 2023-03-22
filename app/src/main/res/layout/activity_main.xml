@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/bg2"
+    tools:context=".MainActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/main_music_list_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:id="@+id/main_music_controller_rl"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="#33EEEEEE">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0.6dp"
+            android:background="#9933FA" />
+
+        <ImageView
+            android:id="@+id/main_music_controller_icon_iv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:background="@mipmap/a1"
+            android:src="@mipmap/icon_song" />
+
+        <TextView
+            android:id="@+id/main_music_controller_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/main_music_controller_icon_iv"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="啊啊啊啊啊" />
+
+        <TextView
+            android:id="@+id/main_music_controller_singer_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/main_music_controller_name_tv"
+            android:layout_alignStart="@id/main_music_controller_name_tv"
+            android:layout_marginTop="10dp"
+            android:textSize="12sp"
+            tools:text="嘻嘻嘻" />
+
+        <ImageView
+            android:id="@+id/main_music_controller_next_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:src="@mipmap/icon_next" />
+
+        <ImageView
+            android:id="@+id/main_music_controller_play_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@id/main_music_controller_next_iv"
+            android:src="@mipmap/icon_play" />
+
+        <ImageView
+            android:id="@+id/main_music_controller_prev_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@id/main_music_controller_play_iv"
+            android:src="@mipmap/icon_last" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
